@@ -1,103 +1,113 @@
-# Bevy GitHub CI Template
+_Brought to you by the Bevy Jam working group._
 
-This repo show how to set up CI on a GitHub project for Bevy.
+# Bevy Quickstart
 
-It creates two workflows:
+This template is a great way to get started on a new [Bevy](https://bevyengine.org/) game—especially for a game jam!
+Start with a [basic project structure](#write-your-game) and [CI / CD](#release-your-game) that can deploy to [itch.io](https://itch.io).
+You can [try this template in your web browser!](https://the-bevy-flock.itch.io/bevy-quickstart)
 
-* [CI](#CI)
-* [Release](#Release)
+Don't want to read through the whole README? [@ChristopherBiscardi](https://github.com/ChristopherBiscardi) made a video on how to use the template from start to finish:
 
-## CI
+[<img src="./docs/thumbnail.png" width=40% height=40% alt="A video tutorial for bevy_quickstart"/>](https://www.youtube.com/watch?v=ESBRyXClaYc)
 
-Definition: [.github/workflows/ci.yaml](./.github/workflows/ci.yaml)
+## Prerequisites
 
-This workflow runs on every commit to `main` branch, and on every PR targeting the `main` branch.
+We assume that you know how to use Bevy already and have seen the [official Quick Start Guide](https://bevyengine.org/learn/quick-start/introduction/).
 
-It will use rust stable on linux, with cache between different executions, those commands:
+## Create a new game
 
-* `cargo test`
-* `cargo clippy -- -D warnings`
-* `cargo fmt --all -- --check`
-
-If you are using anything OS specific or rust nightly, you should update the file [ci.yaml](./.github/workflows/ci.yaml) to use those.
-
-## Release
-
-Definition: [.github/workflows/release.yaml](./.github/workflows/release.yaml)
-
-This workflow runs on every tag.
-
-It will build:
-* For Linux and Windows, a .zip archive containing the executable and the `assets`.
-* For macOS, a dmg image with a .app containing the `assets`.
-* For wasm, a .zip archive with the wasm binary, the js bindings, an html file loading it, and the `assets`.
-
-If you don't want to target some of those platforms, you can remove the corresponding job from the file [release.yaml](./.github/workflows/release.yaml).
-
-If you don't want to attach the builds to the GitHub release, set `env.add_binaries_to_github_release` to `false`.
-
-If you are using Git LFS, set `env.use_git_lfs` to `true` so your assets are properly checked out.
-
-> [!Warning]
-> GitHub's LFS storage has a quota. Please take a look at GitHub's documentation [here](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-storage-and-bandwidth-usage) to understand the quota and costs before enabling this option.
-
-### Git Tag from GitHub UI
-
-You can follow [Managing releases in a repository](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
-
-### Git Tag from the CLI
-
-Execute the following commands: 
+Install [`cargo-generate`](https://github.com/cargo-generate/cargo-generate) and run the following commands:
 
 ```sh
-git tag -a "my-game-1.0" -m "First official release"
-git push --tags
+cargo generate TheBevyFlock/bevy_quickstart --branch cargo-generate
+git branch --move main
 ```
 
-### Result
+Then [create a GitHub repository](https://github.com/new) and push your local repository to it.
 
-A new release will be available in GitHub, with the archives per platform available as downloadable assets.
+<details>
+  <summary>This template can also be set up manually.</summary>
 
-The `git` commands above produced this release: [my-game-1.0](
-https://github.com/bevyengine/bevy_github_ci_template/releases/tag/my-game-1.0).
+Navigate to the top of [this GitHub repository](https://github.com/TheBevyFlock/bevy_quickstart/) and select `Use this template > Create a new repository`:
 
-## Using the workflows in your own project
+![UI demonstration](./docs/readme-manual-setup.png)
 
-If you would like to use the GitHub workflows included here for your own project, there are a few things you might have to adapt:
+Clone your new Github repository to a local repository and push a commit with the following changes:
 
-1. The release workflow relies on the `index.html` file under `/wasm` for web builds
-2. Make sure that the env variable `binary` ([release.yaml](.github/workflows/release.yaml#L10)) matches the name of your binary
-3. Adapt the used toolchain if you are using nightly
-4. In your GitHub repo's settings, under `Actions -> General` make sure "Read and Write permissions" is selected under "Workflow permissions" near the bottom. This fixes the error `Error: Resource not accessible by integration`.
+- Delete `LICENSE`, `README`, and `docs/` files.
+- Search for and replace instances of `bevy_quickstart` with the name of your project.
+- Adjust the `env` variables in [`.github/workflows/release.yaml`](./.github/workflows/release.yaml).
 
+</details>
 
-### Publish on itch.io
+## Write your game
 
-The release flow can be configured to push the releases to itch.io:
+The best way to get started is to play around with what you find in [`src/game/`](./src/game).
 
-1. Create an API key in https://itch.io/user/settings/api-keys
-2. Go to the repository's Settings tab in GitHub, click on Secrets->Actions in the sidebar,and add a repository secret named `BUTLER_CREDENTIALS` set to the API key.
-3. Uncomment `env.itch_target` in `release.yaml` and set it to the itch.io username and the name of the game on itch.io, separated by a slash (`/`)
+This template comes with a basic project structure that you may find useful:
 
-Once that is done, any tag pushed to GitHub will trigger an itch.io release and use the tag as the [user version](https://itch.io/docs/butler/pushing.html#specifying-your-own-version-number).
+| Path                                     | Description                                           |
+|------------------------------------------|-------------------------------------------------------|
+| [`src/lib.rs`](./src/lib.rs)             | App setup                                             |
+| [`src/screen/`](./src/screen)            | Splash screen, title screen, playing screen, etc.     |
+| [`src/game/`](./src/game)                | Game mechanics & content (replace with your own code) |
+| [`src/ui/`](./src/ui)                    | Reusable UI widgets & theming                         |
+| [`src/dev_tools.rs`](./src/dev_tools.rs) | Dev tools for dev builds                              |
+
+Feel free to move things around however you want, though.
+
+If you are new to Bevy, the patterns used in this template may look a bit weird at first glance.
+See our [Design Document](./docs/design.md) for more information on how we structured the code and why.
+
+> [!Tip]
+> Be sure to check out the [3rd-party tools](./docs/tooling.md) we recommend!
+
+## Run your game
+
+Running your game locally is very simple:
+
+- Use `cargo run` to run a native dev build.
+- Use [`trunk serve`](https://trunkrs.dev/) to run a web dev build.
+
+If you're using [VS Code](https://code.visualstudio.com/), this template comes with a [`.vscode/tasks.json`](./.vscode/tasks.json) file.
+
+<details>
+  <summary>Run release builds</summary>
+
+- Use `cargo run --profile release-native --no-default-features` to run a native release build.
+- Use `trunk serve --release --no-default-features` to run a web release build.
+
+</details>
+
+<details>
+    <summary>(Optional) Improve your compile times</summary>
+
+[`.cargo/config_fast_builds.toml`](./.cargo/config_fast_builds.toml) contains documentation on how to set up your environment to improve compile times.
+After you've fiddled with it, rename it to `.cargo/config.toml` to enable it.
+
+</details>
+
+## Release your game
+
+This template uses [GitHub workflows](https://docs.github.com/en/actions/using-workflows) to run tests and build releases.
+See [Workflows](./docs/workflows.md) for more information.
+
+## Known Issues
+
+There are some known issues in Bevy that require some arcane workarounds.
+To keep this template simple, we have opted not to include those workarounds.
+You can read about them in the [Known Issues](./docs/known-issues.md) document.
 
 ## License
 
-Licensed under either of
+The source code in this repository is licensed under any of the following at your option:
 
-* Apache License, Version 2.0
-   ([LICENSE-APACHE-2.0](LICENSE-Apache-2.0) or <http://www.apache.org/licenses/LICENSE-2.0>)
-* MIT License
-   ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
-* CC0-1.0 License
-   ([LICENSE-CC0-1.0](LICENSE-CC0-1.0) or <https://creativecommons.org/publicdomain/zero/1.0/legalcode>)
+- [CC0-1.0 License](./LICENSE-CC0-1.0.txt)
+- [MIT License](./LICENSE-MIT.txt)
+- [Apache License, Version 2.0](./LICENSE-Apache-2.0.txt)
 
-at your option.
+We hold no patent rights to anything presented in this repository.
 
-The Ducky sprite is CC-0 licensed by [Caz Creates Games](https://caz-creates-games.itch.io/ducky-2).
+## Credits
 
-## Contribution
-
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-triple licensed as above, without any additional terms or conditions.
+The [assets](./assets) in this repository are all 3rd-party. See the [credits screen](./src/screen/credits.rs) for more information.
