@@ -1,4 +1,4 @@
-#![allow(clippy::too_many_arguments, clippy::type_complexity)]
+#![cfg_attr(not(feature = "dev"), windows_subsystem = "windows")]
 
 use bevy::prelude::*;
 use wicked_moon::AppPlugin;
