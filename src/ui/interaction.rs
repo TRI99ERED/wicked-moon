@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{game::assets::SfxKey, audio::sfx::PlaySfx};
+use crate::{audio::sfx::PlaySfx, game::assets::SfxKey};
 
 pub(super) struct InteractionPlugin;
 

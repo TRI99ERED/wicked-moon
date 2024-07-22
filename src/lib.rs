@@ -1,8 +1,10 @@
+use avian2d::prelude::*;
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
 mod audio;
-mod main_camera;
+mod controls;
 mod game;
+mod main_camera;
 mod screen;
 mod ui;
 
@@ -20,6 +22,7 @@ impl Plugin for AppPlugin {
                 meta_check: AssetMetaCheck::Never,
                 ..default()
             }),
+            PhysicsPlugins::default(),
             AudioPlugin,
             GamePlugin,
             MainCameraPlugin,

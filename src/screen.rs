@@ -16,9 +16,15 @@ pub(super) struct ScreenPlugin;
 
 impl Plugin for ScreenPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((CreditsPlugin, LoadingPlugin, PlayingPlugin, SplashPlugin, TitlePlugin))
-            .init_state::<Screen>()
-            .enable_state_scoped_entities::<Screen>();
+        app.add_plugins((
+            CreditsPlugin,
+            LoadingPlugin,
+            PlayingPlugin,
+            SplashPlugin,
+            TitlePlugin,
+        ))
+        .init_state::<Screen>()
+        .enable_state_scoped_entities::<Screen>();
     }
 }
 
