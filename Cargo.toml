@@ -1,8 +1,37 @@
 [package]
 name = "wicked-moon"
+authors = ["Andrii Kuchmenda <kuanwithxl@gmail.com>"]
 version = "0.1.0"
 edition = "2021"
-license = "MIT OR Apache-2.0 OR CC0-1.0"
+
+[dependencies]
+avian2d = "0.1.1"
+bevy = { version = "0.14", features = ["wayland"] }
+# Disable low-severity logs at compile time for performance.
+log = { version = "0.4", features = [
+    "max_level_debug",
+    "release_max_level_warn",
+] }
+rand = "0.8"
+utils = { git = "https://github.com/TRI99ERED/bevy-utils" }
+
+[features]
+default = [
+    # Default to a native dev build.
+    "dev_native",
+]
+dev = [
+    # Improve compile times for dev builds by linking Bevy as a dynamic library.
+    "bevy/dynamic_linking",
+    "bevy/bevy_dev_tools",
+]
+dev_native = [
+    "dev",
+    # Enable asset hot reloading for native dev builds.
+    "bevy/file_watcher",
+    # Enable embedded asset hot reloading for native dev builds.
+    "bevy/embedded_watcher",
+]
 
 # Idiomatic Bevy code often triggers these lints, and the CI workflow treats them as errors.
 # In some cases they may still signal poor code quality however, so consider commenting out these lines.
@@ -14,13 +43,13 @@ too_many_arguments = "allow"
 type_complexity = "allow"
 
 # Compile with Performance Optimizations:
-# https://bevyengine.org/learn/book/getting-started/setup/#compile-with-performance-optimizations
+# https://bevyengine.org/learn/quick-start/getting-started/setup/#compile-with-performance-optimizations
 
-# Enable a small amount of optimization in debug mode
+# Enable a small amount of optimization in the dev profile.
 [profile.dev]
 opt-level = 1
 
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+# Enable a large amount of optimization in the dev profile for dependencies.
 [profile.dev.package."*"]
 opt-level = 3
 
@@ -52,13 +81,3 @@ inherits = "release"
 opt-level = 3
 # Keep debug information in the binary.
 strip = "none"
-
-[dependencies]
-avian2d = "0.1.1"
-bevy = "0.14"
-log = { version = "0.4", features = [
-    "max_level_debug",
-    "release_max_level_warn",
-] }
-rand = "0.8.5"
-utils = { git = "https://github.com/TRI99ERED/bevy-utils" }
