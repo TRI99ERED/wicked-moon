@@ -1,5 +1,8 @@
 use avian2d::prelude::{Collider, RigidBody};
-use bevy::{prelude::*, sprite::{MaterialMesh2dBundle, Mesh2dHandle}};
+use bevy::{
+    prelude::*,
+    sprite::{MaterialMesh2dBundle, Mesh2dHandle},
+};
 
 pub mod moon;
 pub mod player;
@@ -37,7 +40,7 @@ fn on_spawn_level(
         RigidBody::Static,
         Collider::rectangle(50., 50.),
     ));
-    
+
     let mesh = Mesh2dHandle(meshes.add(Annulus::new(475., 1000.)));
     let material = materials.add(Color::WHITE);
 
