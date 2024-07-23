@@ -10,6 +10,8 @@ use crate::{
     screen::Screen,
 };
 
+use super::moon::bullet::Bullet;
+
 const PLAYER_SPAWN_POS: Vec2 = Vec2::new(0., -250.);
 const PLAYER_Z: f32 = 1.;
 
@@ -19,12 +21,14 @@ const PLAYER_SHAPE: Triangle2d = Triangle2d::new(
     Vec2::new(20., -10.),
 );
 const PLAYER_HITBOX_RADIUS: f32 = 10.;
+const PLAYER_SPEED: f32 = 200.;
 
 pub(super) struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.observe(on_spawn_player);
+        app.add_systems(Update, collide_with_bullet)
+            .observe(on_spawn_player);
     }
 }
 
@@ -47,7 +51,9 @@ fn on_spawn_player(
         .spawn((
             Player,
             MovementController::default(),
-            Movement { speed: 100. },
+            Movement {
+                speed: PLAYER_SPEED,
+            },
             MaterialMesh2dBundle {
                 mesh,
                 material,
@@ -70,4 +76,24 @@ fn on_spawn_player(
                 ..Default::default()
             });
         });
+}
+
+fn collide_with_bullet(
+    mut collision_event_reader: EventReader<CollisionStarted>,
+    player_query: Query<Entity, With<Player>>,
+    bullet_query: Query<Entity, With<Bullet>>,
+) {
+    if let Ok(player) = player_query.get_single() {
+        for &CollisionStarted(entity1, entity2) in collision_event_reader.read() {
+            if entity1 == player {
+                if bullet_query.iter().any(|e| e == entity2) {
+                    println!("hit");
+                }
+            } else if entity2 == player {
+                if bullet_query.iter().any(|e| e == entity1) {
+                    println!("hit");
+                }
+            }
+        }
+    }
 }

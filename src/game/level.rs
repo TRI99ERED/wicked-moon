@@ -35,13 +35,13 @@ fn on_spawn_level(
 
     // Bottom Player stoper
     commands.spawn((
-        SpatialBundle::from_transform(Transform::from_translation(Vec2::new(0., -500.).extend(0.))),
+        SpatialBundle::from_transform(Transform::from_translation(Vec2::new(0., -360.).extend(0.))),
         StateScoped(Screen::Playing),
         RigidBody::Static,
         Collider::rectangle(50., 50.),
     ));
 
-    let mesh = Mesh2dHandle(meshes.add(Annulus::new(475., 1000.)));
+    let mesh = Mesh2dHandle(meshes.add(Annulus::new(335., 1000.)));
     let material = materials.add(Color::WHITE);
 
     commands.spawn(MaterialMesh2dBundle {

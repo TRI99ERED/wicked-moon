@@ -81,6 +81,6 @@ fn apply_rotation(
     mut rotation_query: Query<(&MovementController, &Rotation, &mut AngularVelocity)>,
 ) {
     for (controller, rotation, mut velocity) in &mut rotation_query {
-        velocity.0 = rotation.speed * controller.0.x;
+        velocity.0 = -rotation.speed * controller.0.x;
     }
 }

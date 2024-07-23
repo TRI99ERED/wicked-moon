@@ -4,6 +4,12 @@ use bevy::{
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
 
+pub mod bullet;
+pub mod spawner;
+
+use bullet::{BulletPlugin, Simple};
+use spawner::{SpawnSpawner, Spawner, SpawnerPlugin, Straight};
+
 use crate::{
     game::movement::{MovementController, Rotation},
     screen::Screen,
@@ -15,7 +21,8 @@ pub(super) struct MoonPlugin;
 
 impl Plugin for MoonPlugin {
     fn build(&self, app: &mut App) {
-        app.observe(on_spawn_moon);
+        app.add_plugins((BulletPlugin, SpawnerPlugin))
+            .observe(on_spawn_moon);
     }
 }
 
@@ -34,19 +41,28 @@ fn on_spawn_moon(
     let mesh = Mesh2dHandle(meshes.add(Rectangle::new(50., 50.)));
     let material = materials.add(Color::WHITE);
 
-    commands.spawn((
-        Moon,
-        MovementController::default(),
-        Rotation { speed: 10. },
-        MaterialMesh2dBundle {
-            mesh,
-            material,
-            transform: Transform::from_translation(Vec2::ZERO.extend(MOON_Z)),
-            ..Default::default()
-        },
-        StateScoped(Screen::Playing),
-        RigidBody::Kinematic,
-        Collider::circle(50.),
-        LockedAxes::TRANSLATION_LOCKED,
+    let moon = commands
+        .spawn((
+            Moon,
+            MovementController::default(),
+            Rotation { speed: 10. },
+            MaterialMesh2dBundle {
+                mesh,
+                material,
+                transform: Transform::from_translation(Vec2::ZERO.extend(MOON_Z)),
+                ..Default::default()
+            },
+            StateScoped(Screen::Playing),
+            RigidBody::Kinematic,
+            Collider::circle(50.),
+            LockedAxes::TRANSLATION_LOCKED,
+        ))
+        .id();
+
+    commands.trigger(SpawnSpawner::new(
+        Spawner::<Simple>::new(1.),
+        Straight,
+        moon,
+        Transform::default(),
     ));
 }
