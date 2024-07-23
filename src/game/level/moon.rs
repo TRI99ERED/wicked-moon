@@ -1,3 +1,5 @@
+use std::f32::consts::{FRAC_PI_4, FRAC_PI_6, PI};
+
 use avian2d::prelude::{Collider, LockedAxes, RigidBody};
 use bevy::{
     prelude::*,
@@ -45,7 +47,7 @@ fn on_spawn_moon(
         .spawn((
             Moon,
             MovementController::default(),
-            Rotation { speed: 10. },
+            Rotation { speed: 1. },
             MaterialMesh2dBundle {
                 mesh,
                 material,
@@ -59,10 +61,21 @@ fn on_spawn_moon(
         ))
         .id();
 
-    commands.trigger(SpawnSpawner::new(
-        Spawner::<Simple>::new(1.),
-        Straight,
-        moon,
-        Transform::default(),
-    ));
+    #[inline(always)]
+    fn spawn_straight_spawner(commands: &mut Commands, moon: Entity, cd: f32, angle: f32) {
+        commands.trigger(SpawnSpawner::new(
+            Spawner::<Simple>::new(cd),
+            Straight,
+            moon,
+            Transform::from_rotation(Quat::from_axis_angle(Vec3::Z, angle)),
+        ));
+    }
+
+    spawn_straight_spawner(&mut commands, moon, 1., 0.);
+    spawn_straight_spawner(&mut commands, moon, 1., -FRAC_PI_4);
+    spawn_straight_spawner(&mut commands, moon, 1., FRAC_PI_4);
+    spawn_straight_spawner(&mut commands, moon, 1., -FRAC_PI_6);
+    spawn_straight_spawner(&mut commands, moon, 1., FRAC_PI_6);
+    spawn_straight_spawner(&mut commands, moon, 1., -PI / 12.);
+    spawn_straight_spawner(&mut commands, moon, 1., PI / 12.);
 }

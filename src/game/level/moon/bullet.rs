@@ -138,6 +138,7 @@ fn move_bullets<B: BulletType>(
 ) {
     let delta = time.delta_seconds();
     for mut transform in &mut bullet_query {
-        transform.translation += B::speed() * delta * Vec3::X;
+        let rotation = transform.rotation;
+        transform.translation += B::speed() * delta * (rotation * -Vec3::Y);
     }
 }
